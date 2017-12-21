@@ -23,7 +23,7 @@ int main() {
 	ifstream myReadFile;
 
 	/*Map of branches*/
-	map <string, Branch> branchMap;
+	map <unsigned int, Branch> branchMap;
 
 	int m = 0;
 	int k = 0;
@@ -52,30 +52,6 @@ int main() {
 
 		Branch currentBranch(k);
 
-		if (branchMap.find(address) == branchMap.end())
-		{
-			currentBranch.columns.resize(pow(2, k), 3); //If this branch has not been 'hit' yet.
-			branchMap[address] = currentBranch;
-		}
-
-		else
-		{
-			currentBranch = branchMap[address]; //If it does exist (we have 'hit' it) then just set equal to existing branch.
-		}
-
-		// Setup BHR
-		string BHRstring;
-
-		for (int i = 0; i < k; i++)
-		{
-			BHRstring += to_string(BHR[i]);
-		}
-
-		bitset<32> binaryBHR(BHRstring);
-
-		// Multiply the bits by the youngest BHR value
-		unsigned int column = binaryBHR.to_ulong();
-		
 		// Reconstruct branch address
 		string sReturn = "";
 		for (int i = 0; i < address.length(); ++i)
@@ -100,10 +76,33 @@ int main() {
 				case 'f': sReturn.append("1111"); break;
 			}
 		}
-		sReturn.resize(m);
+		sReturn.substr(32 - m, m);
 		bitset<32> binaryBranch(sReturn);
-		
-		unsigned int row = binaryBranch.to_ulong();
+		unsigned int row = binaryBranch.to_ulong(); //Key to our PHT
+
+		if (branchMap.find(row) == branchMap.end())
+		{
+			currentBranch.columns.resize(pow(2, m+k), 3); //If this branch has not been 'hit' yet.
+			branchMap[row] = currentBranch;
+		}
+
+		else
+		{
+			currentBranch = branchMap[row]; //If it does exist (we have 'hit' it) then just set equal to existing branch.
+		}
+
+		// Setup BHR
+		string BHRstring;
+
+		for (int i = 0; i < k; i++)
+		{
+			BHRstring += to_string(BHR[i]);
+		}
+
+		bitset<32> binaryBHR(BHRstring);
+
+		// Multiply the bits by the youngest BHR value
+		unsigned int column = binaryBHR.to_ulong();
 
 		int PHT = currentBranch.columns[row*column]; //Index into the column at the current branch to see it's history.
 
@@ -155,7 +154,6 @@ int main() {
 			}
 		}
 		currentBranch.columns[column] = PHT;
-		cout << currentBranch.columns[column] << endl;
 		int newState; // Translate confidence (Strong/weak) to a definite state (T/NT)
 
 		switch (PHT)

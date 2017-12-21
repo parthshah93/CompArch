@@ -1,12 +1,11 @@
-#include "Branch.h"
+// Parth Shah
+// Computing Systems Architecture 
+// Dec 16, 2017
+// Lab 2
 
-Branch::Branch(int curK)
-{
-	listSize = curK;
-	//vector<int> columns(pow(2, curK), 3); // Columns filled Strongly Taken, i.e 3 = [1 1]
-}
+#include "Branch.h"
 
 Branch::Branch()
 {
-
+	
 }
